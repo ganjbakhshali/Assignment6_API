@@ -32,6 +32,8 @@ class Course(Base):
 
 Base.metadata.create_all(bind=engine)
 
+##------------------students------------------
+
 @app.get("/students/{student_id}")
 def read_student(student_id: int):
     db = SessionLocal()
@@ -78,6 +80,15 @@ def delete_student(student_id: int):
     db.delete(student)
     db.commit()
     return {"message": "Student deleted successfully"}
+
+
+
+##-----------------courses---------------
+@app.get("/courses/")
+def read_courses():
+    db = SessionLocal()
+    courses = db.query(Course).all()
+    return courses
 
 @app.post("/courses/")
 def create_course(name: str, unit: int, student_id: int):
