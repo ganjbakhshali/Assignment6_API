@@ -21,10 +21,9 @@ class User(Base):
     name = Column(String, index=True)
     email = Column(String, unique=True, index=True)
 
-# Create tables in the database
+
 Base.metadata.create_all(bind=engine)
 
-# Routes for CRUD operations
 @app.get("/users/{user_id}")
 def read_user(user_id: int):
     db = SessionLocal()
