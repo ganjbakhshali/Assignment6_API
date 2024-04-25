@@ -1,5 +1,4 @@
-FROM postgres
-
+FROM python
 
 # 
 WORKDIR /code
@@ -14,4 +13,4 @@ RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 COPY ./app /code/app
 
 # 
-CMD ["uvicorn", "app.uni_main:app", "--host", "0.0.0.0", "--port", "5432"]
+CMD ["uvicorn", "app.uni_main:app", "--host", "0.0.0.0", "--port", "80"]
