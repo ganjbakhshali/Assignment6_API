@@ -5,13 +5,11 @@ from sqlalchemy.orm import sessionmaker, relationship
 
 app = FastAPI()
 
-# SQLALCHEMY_DATABASE_URL = "postgresql://akbar:ramze_akbar_agha@localhost:5432/database_akbar"
-SQLALCHEMY_DATABASE_URL = "postgresql://akbar_agha:ramze_akbar_agha@localhost:5432/database_akbar_agha"
+SQLALCHEMY_DATABASE_URL = "postgresql://postgres:123@localhost/postgres"
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
-
 class Student(Base):
     __tablename__ = "students"
 
@@ -22,6 +20,7 @@ class Student(Base):
     graduated = Column(Boolean)
     courses = relationship("Course", back_populates="student")
 
+
 class Course(Base):
     __tablename__ = "courses"
 
@@ -31,9 +30,17 @@ class Course(Base):
     student_id = Column(Integer, ForeignKey("students.id"))
     student = relationship("Student", back_populates="courses")
 
+
 Base.metadata.create_all(bind=engine)
 
-##------------------students------------------
+@app.post("/students/")
+def create_student(firstname: str, lastname: str, average: float, graduated: bool):
+    db = SessionLocal()
+    student = Student(firstname=firstname, lastname=lastname, average=average, graduated=graduated)
+    db.add(student)
+    db.commit()
+    db.refresh(student)
+    return student
 
 @app.get("/students/{student_id}")
 def read_student(student_id: int):
@@ -48,15 +55,6 @@ def read_students():
     db = SessionLocal()
     students = db.query(Student).all()
     return students
-
-@app.post("/students/")
-def create_student(firstname: str, lastname: str, average: float, graduated: bool):
-    db = SessionLocal()
-    student = Student(firstname=firstname, lastname=lastname, average=average, graduated=graduated)
-    db.add(student)
-    db.commit()
-    db.refresh(student)
-    return student
 
 @app.put("/students/{student_id}")
 def update_student(student_id: int, firstname: str, lastname: str, average: float, graduated: bool):
@@ -82,15 +80,6 @@ def delete_student(student_id: int):
     db.commit()
     return {"message": "Student deleted successfully"}
 
-
-
-##-----------------courses---------------
-@app.get("/courses/")
-def read_courses():
-    db = SessionLocal()
-    courses = db.query(Course).all()
-    return courses
-
 @app.post("/courses/")
 def create_course(name: str, unit: int, student_id: int):
     db = SessionLocal()
@@ -99,6 +88,20 @@ def create_course(name: str, unit: int, student_id: int):
     db.commit()
     db.refresh(course)
     return course
+
+@app.get("/courses/{course_id}")
+def read_course(course_id: int):
+    db = SessionLocal()
+    course = db.query(Course).filter(Course.id == course_id).first()
+    if course is None:
+        raise HTTPException(status_code=404, detail="Course not found")
+    return course
+
+@app.get("/courses/")
+def read_courses():
+    db = SessionLocal()
+    courses = db.query(Course).all()
+    return courses
 
 @app.put("/courses/{course_id}")
 def update_course(course_id: int, name: str, unit: int):
