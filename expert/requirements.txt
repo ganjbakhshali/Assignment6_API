@@ -1,0 +1,6 @@
+numpy
+python-multipart
+sqlalchemy
+psycopg2
+fastapi
+uvicorn[standard]

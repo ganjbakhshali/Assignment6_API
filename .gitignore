@@ -1,7 +1,0 @@
-pycache/
-*.db
-venv/
-.vscode/
-.idea/
-*.code-workspace
-logs/
